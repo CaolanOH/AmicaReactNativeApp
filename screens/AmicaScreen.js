@@ -9,146 +9,29 @@ const socket = io.connect('http://127.0.0.1:5000')
 // Feather Icon
 import { Feather } from '@expo/vector-icons'; 
 //importing colors for styling
-import colors from "../config/colors"
-
+import colors from "../config/colors";
+// importing components
+import Chat from '../components/Chat';
 
 const AmicaScreen = () => {
 
-const user = useSelector((state) => state.user.value);
 
-// useState for the users current message they want to send
-const [currentMessage, setCurrentMessage] = useState("");
+
 // socket.io connection event
-socket.on('connect', () =>{
-  console.log('React native');
+socket.on('connect', (chatHistory) =>{
+  console.log('Connected to Flask app');
+
 })
 
 
-// useEffect for displaying messages.
-useEffect(() => {
-  socket.on("message_received", (data) =>{
-      console.log(`Received Message`);
-      console.log(data);
-      // using spread operator.. look into it. Opens up the array and put the content(data) at the end if array.
-      //setMessageList((prevState) => [...prevState, data])
-  })
-}, [socket])
-
-//Function to send message
-const sendMessage = () => {
-  if(currentMessage !== ""){
-    console.log("Message Sent");
-    const messageData = {
-      message: currentMessage
-    };
-    console.log(messageData);
-    socket.emit('message_sent', messageData);
-  }
-}
 
 
 
 //Dummy data
-const dummyMessages = [
-  {
-    key: 1,
-    msgAuthor: "amica",
-    message: "Hey, whatsup?",
-    time : new Date().getHours()+":"+ new Date().getMinutes()
-  },
-  {
-    id: 2,
-    msgAuthor: "you",
-    message: "I'm stressed from work",
-    time : new Date().getHours()+":"+ new Date().getMinutes()
-  },
-  {
-    id: 3,
-    msgAuthor: "amica",
-    message: "Okay, lets log this mood !",
-    time : new Date().getHours()+":"+ new Date().getMinutes()
-  },
-  {
-    id: 4,
-    msgAuthor: "you",
-    message: "Sure",
-    time : new Date().getHours()+":"+ new Date().getMinutes()
-  },
-  {
-    id: 5,
-    msgAuthor: "amica",
-    message: "Describe the mood",
-    time : new Date().getHours()+":"+ new Date().getMinutes()
-  },
-  {
-    id: 6,
-    msgAuthor: "you",
-    message: "Stressed",
-    time : new Date().getHours()+":"+ new Date().getMinutes()
-  },
-  {
-    id: 7,
-    msgAuthor: "And the cause ?",
-    message: "And the cause ?",
-    time : new Date().getHours()+":"+ new Date().getMinutes()
-  },
-  {
-    id: 8,
-    msgAuthor: "you",
-    message: "Work",
-    time : new Date().getHours()+":"+ new Date().getMinutes()
-  },
-  {
-    id: 9,
-    msgAuthor: "amica",
-    message: "Hmm, I think I might have something for you. So if something is stressing you out regularly like work this tension can build up day after day. It’s important to have a destressing routine. This can be meditation or a relaxation technique to do when you’re home from work. Want to hear?",
-    time : new Date().getHours()+":"+ new Date().getMinutes()
-  },
-  ]
   return (
   <>
     <SafeAreaView style={styles.container}>
-        {/* <View style={item.msgAuthor==="you" ? styles.youMsgContainer:styles.amicaMsgContainer}>
-        <View>
-          <Text>{item.msgAuthor ==="you"? "You:":"Amica:"}</Text>
-          <View style={item.msgAuthor === "you" ? styles.youMsgBox:styles.amicaMsgBox} >
-            <Text>{item.message}</Text>
-          </View>
-          </View>
-        </View>
-        <View style={styles.youMsgContainer}>
-        <View>
-          <Text>You :</Text>
-          <View style={styles.youMsgBox} >
-            <Text>This is a test message for the amica chat message design.</Text>
-          </View>
-          </View>
-        </View> */}
-        <FlatList
-        keyExtractor={(item) => item.id} 
-        data={dummyMessages}
-        renderItem={({ item }) => (
-          <View style={item.msgAuthor==="you" ? styles.youMsgContainer:styles.amicaMsgContainer}>
-          <View>
-            <Text>{item.msgAuthor ==="you"? "You:":"Amica:"}</Text>
-            <View style={item.msgAuthor === "you" ? styles.youMsgBox:styles.amicaMsgBox} >
-              <Text>{item.message}</Text>
-              <Text>{item.time}</Text>
-            </View>
-            </View>
-          </View>
-      
-        )} />
-        <View style={styles.chatfooter}>
-        <TextInput
-          style={styles.messageInput} 
-          placeholder='Message...'
-          //onChangeText={(message) => setCurrentMessage(message)}
-          //onSubmitEditing={() => sendMessage()}
-        />
-        {/* <Feather name="send" size={24} color="black" /> */}
-        </View>
-    
+    <Chat socket={socket} />
     </SafeAreaView>
       </>
   )

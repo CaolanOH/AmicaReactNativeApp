@@ -2,8 +2,9 @@
 import {useState} from 'react'
 // React Redux imports
 import { Provider, useSelector } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import userReducer from './store/user';
+import chatHistoryReducer from './store/chatHistory';
 
 // Async Storage imports
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,18 +33,20 @@ import { FontAwesome5 } from '@expo/vector-icons';
 // Redux store that holds the redux reducers
 const store = configureStore({
     reducer: {
-      user: userReducer, 
+      user: userReducer,
+      chatHistory: chatHistoryReducer
     }
 });
 
+
 const App = () => {
-  // const user = useSelector((state) => state.user.value);
+// const stateUser = useSelector((state) => state.user.value);
 // Stack Navigator for all of application
 const Stack = createNativeStackNavigator();
 // Tab navigator for main features
 const BottomTabs = createBottomTabNavigator();
 // User Authentication useState for 
-const [authenticated, setAuthenticated] = useState(true)
+const [authenticated, setAuthenticated] = useState(false)
 // Function to check users authenticated state. Depending on state then save or remove JWT Token from local storage
 const onAuthenticated = async (auth, token) =>{
   setAuthenticated(auth)
@@ -134,13 +137,15 @@ const MyTheme = {
                         </BottomTabs.Navigator>
   }  
 
-  return (
-    <Provider store={store}>
-    <NavigationContainer theme={MyTheme}>
+
+  const Authentication = () => {
+    const user = useSelector((state) => state.user.value);
+
+    return (
       <Stack.Navigator screenOptions={{headerShown: false}}>
-    {!authenticated ? (
+      {!user.auth ? (
          <>
-          <Stack.Screen name="Welcome" component={WelcomeScreen} onAuthenticated={onAuthenticated} authenticated={authenticated} />
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
         </>
         ):( 
@@ -150,6 +155,13 @@ const MyTheme = {
         </>
       )} 
       </Stack.Navigator>
+    );
+  }
+
+  return (
+    <Provider store={store}>
+    <NavigationContainer theme={MyTheme}>
+        <Authentication />
     </NavigationContainer>
     </Provider>
   );

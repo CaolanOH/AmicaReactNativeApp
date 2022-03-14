@@ -4,9 +4,8 @@ import axios from 'axios'
 import { SafeAreaView, TextInput, StyleSheet, Text, View,TouchableOpacity,StatusBar, Platform } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 // React redux useDispatch hook login action from redux
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../store/user';
-import { useSelector } from 'react-redux';
 // colors
 import colors from "../config/colors"
 
@@ -14,7 +13,7 @@ const WelcomeScreen = (props) => {
   const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
   // useState for login form
-  const [form, setForm] = useState({email:"", password:""})
+  const [form, setForm] = useState({email:"mohche@test.com", password:"secret"})
   // Handling user email
   const handleFormInput = (field, value) => {
     setForm({ 
@@ -48,11 +47,19 @@ const WelcomeScreen = (props) => {
         password: form.password
       })
         .then(response => {
-          console.log(response.data.access_token)
-          props.onAuthenticated(true, response.data.auth_token)
+          console.log({
+            "username":response.data.username,
+            "email":response.data.email,
+            "access_token":response.data.access_token
+          })
+          // props.onAuthenticated(true, response.data.auth_token)
+          dispatch(login({name:response.data.username, email:form.email, access_token:response.data.access_token, auth:true}))
          
       })
-      .catch(err => console.log(err))
+      .catch(err => {
+        console.log(err)
+        // console.log(err.response)
+      })
     }
   return (
         <>
@@ -72,8 +79,8 @@ const WelcomeScreen = (props) => {
               name="email" 
               style={styles.input} 
               keyboardType="default"
-              //onChangeText={(email) => handleFormInput('email', email)}
-              //onSubmitEditing={submitForm}
+              onChangeText={(email) => handleFormInput('email', email)}
+              onSubmitEditing={submitForm}
               />
           </View>
           {/* Password label */}
@@ -87,15 +94,15 @@ const WelcomeScreen = (props) => {
               style={styles.input} 
               secureTextEntry={true}
               keyboardType="default"
-              //onChangeText={(password) => handleFormInput('password', password)}
-              //onSubmitEditing={submitForm}
+              onChangeText={(password) => handleFormInput('password', password)}
+              onSubmitEditing={submitForm}
             />
               </View>
               {/* Login button */}
               <View style={{flex:3}}>
               <TouchableOpacity style={{alignItems:"center"}}>
                 <View style={styles.logInBtn}>
-                  <Text onPress={() =>{dispatch(login({name:"Caolan", email:"caolan@test.com", access_token:"12345", auth:false}))}} style={styles.logInBtnText}>LOGIN</Text>
+                  <Text onPress={submitForm} style={styles.logInBtnText}>LOGIN</Text>
                 </View>
               </TouchableOpacity>
               </View>
