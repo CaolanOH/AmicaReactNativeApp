@@ -21,6 +21,7 @@ const sendMessage = () => {
       time: new Date().getHours()+":"+ new Date().getMinutes()
     };
     dispatch(addMessage(messageData))
+    console.log("This is the chat history below")
     console.log(chatHistory)
     socket.emit('msg_from_react', messageData);
   }
@@ -29,16 +30,19 @@ const sendMessage = () => {
 // useEffect for displaying messages.
 useEffect(() => {
   socket.on("msg_from_flask", (data) =>{
-      console.log(`Received Message`);
-      const messageData = {
-        message: data.response,
-        msgAuthor: "Amica",
-        time: new Date().getHours()+":"+ new Date().getMinutes(),
-        context: data.context
-      }
-      console.log(messageData);
+      console.log(`Received Message from flask, this is in the useEffect`);
+
+      // const messageData = {
+      //   message: data.response,
+      //   msgAuthor: "Amica",
+      //   time: new Date().getHours()+":"+ new Date().getMinutes(),
+      //   context: data.context
+      // }
+      console.log(data);
       // using spread operator.. look into it. Opens up the array and put the content(data) at the end if array.
-      dispatch(addMessage(messageData))
+      dispatch(addMessage(data))
+      console.log("Outputing the chat history below this is in the useEffect")
+      console.log(chatHistory.msg)
 
   })
 }, [socket])
@@ -105,42 +109,42 @@ const dummyMessages = [
 <>
     <FlatList
     data={chatHistory}
+
     renderItem={({ item }) => (
       <View style={item.msgAuthor==="you" ? styles.youMsgContainer:styles.amicaMsgContainer}>
+        {console.log("printing whole item object")}
+        {console.log(item)}
       <View>
         <Text>{item.msgAuthor ==="you"? "You:":"Amica:"}</Text>
         <View style={item.msgAuthor === "you" ? styles.youMsgBox:styles.amicaMsgBox} >
-          <Text>{item.message}</Text>
-          <Text>{item.time}</Text>
+          <Text>{item.msg}</Text>
+          <Text>{item.timestamp}</Text>
+        </View> 
         </View>
-        {
-          item.context && item.context.length > 0 ? (
-            <FlatList
-            data={item.context}
-            renderItem={({ context }) => (
-              <View style={styles.amicaMsgContainer}>
-                {console.log("item.context")}
-                {console.log(item.context)}
-                {console.log("///item.context")}
-                {console.log(context)}
-                <View>
-                  <Text>Amica</Text>
-                  <View style={styles.amicaMsgBox} >
-                    <Text>{context.response[0]}</Text>
-                    <Text>{item.time}</Text>
-                  </View>
+        {item.context && item.context.length > 0 ? (
+              <View>
+              {console.log("item.context")}
+              {console.log(item.context[1])}
+              {console.log("///item.context")}
+              {console.log(item.context)}
+                <Text>Amica</Text> 
+                <View style={styles.amicaMsgBox} >
+                  <Text>{item.context[1].response}</Text>
+                  <Text>{item.timestamp}</Text>
                 </View>
               </View>
-            )}/>
-          ):(
-            <>
-            <Text>None</Text>
-            </>
-          )
-        }
-        </View>
+    
+          
+       ):(
+          <>
+          <Text>None</Text>
+          </>
+        )}
       </View>
-    )} />
+    )} 
+ 
+    />
+    
     <View style={styles.chatfooter}>
     <TextInput
       style={styles.messageInput} 
