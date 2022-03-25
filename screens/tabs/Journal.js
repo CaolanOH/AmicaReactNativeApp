@@ -1,27 +1,15 @@
-import React from 'react'
-import { StyleSheet, Text, View} from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons'; 
+import {useEffect, useState} from 'react'
+import axios from 'axios';
+import { StyleSheet, Text, View, SafeAreaView} from 'react-native';
+import JournalList from '../../components/JournalList';
 const Journal = () => {
   return (
-    <View style={styles.smiley}>
-    <FontAwesome5 name="smile-beam" size={104} color="#333333" />
-    <Text style={styles.amicaTextStyle}>Amica</Text>
-    <Text>This will be the journal tab that will have journal entries information on it</Text>
-    </View>
+    <SafeAreaView>
+        <JournalList/>
+    </SafeAreaView>
   )
 }
 const styles = StyleSheet.create({
-    smiley: {
-      flex: 1,
-      backgroundColor: '#fff',
-      alignItems: 'center',
-      justifyContent: 'center'
-    },
-    amicaTextStyle: {
-      fontSize: 48,
-      fontWeight: "600",
-      fontStyle:"italic",
-      color:"#333333"
-    }
+
 });
 export default Journal

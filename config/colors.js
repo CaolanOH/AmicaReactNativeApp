@@ -1,8 +1,9 @@
 export default {
-    primary: "#A5C8E4",
-    secondary: "#C0ECCC",
-    danger: "#F6A8A6",
+    primary: "#2F80ED",
+    secondary: "#F7F7F7",
+    danger: "#ED3D2F",
     warning: "#F4CDA6",
-    background: "#F8F3EA",
-    font: "#333333"
+    background: "#FFFFFF",
+    font: "#333333",
+    label: '#4F5E7B'
 }

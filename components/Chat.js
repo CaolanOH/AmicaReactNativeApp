@@ -3,11 +3,13 @@ import { StyleSheet, Text, View,  TextInput, FlatList } from 'react-native';
 import colors from '../config/colors';
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage } from '../store/chatHistory';
-
+import user from '../store/user';
+import moment from 'moment';
 
 const Chat = ({ socket }) => {
-const chatHistory = useSelector((state) =>state.chatHistory.value)
-const dispatch = useDispatch();
+  const chatHistory = useSelector((state) =>state.chatHistory.value)
+  const user = useSelector((state) =>state.user.value)
+  const dispatch = useDispatch();
 
 // useState for the users current message they want to send
 const [currentMessage, setCurrentMessage] = useState("");
@@ -16,14 +18,17 @@ const sendMessage = () => {
   if(currentMessage !== ""){
     console.log("Message Sent");
     const messageData = {
-      message: currentMessage,
-      msgAuthor: "you",
-      time: new Date().getHours()+":"+ new Date().getMinutes()
+      token:  user.access_token,
+      msg: currentMessage,
+      is_user: true,
+      timestamp: new Date().toISOString(),
+      context:""
     };
     dispatch(addMessage(messageData))
     console.log("This is the chat history below")
     console.log(chatHistory)
     socket.emit('msg_from_react', messageData);
+  
   }
 }
 
@@ -31,13 +36,6 @@ const sendMessage = () => {
 useEffect(() => {
   socket.on("msg_from_flask", (data) =>{
       console.log(`Received Message from flask, this is in the useEffect`);
-
-      // const messageData = {
-      //   message: data.response,
-      //   msgAuthor: "Amica",
-      //   time: new Date().getHours()+":"+ new Date().getMinutes(),
-      //   context: data.context
-      // }
       console.log(data);
       // using spread operator.. look into it. Opens up the array and put the content(data) at the end if array.
       dispatch(addMessage(data))
@@ -48,93 +46,28 @@ useEffect(() => {
 }, [socket])
 
 
-    //Dummy data
-const dummyMessages = [
-    {
-      id: 1,
-      msgAuthor: "amica",
-      message: "Hey, whatsup?",
-      time : new Date().getHours()+":"+ new Date().getMinutes()
-    },
-    {
-      id: 2,
-      msgAuthor: "you",
-      message: "I'm stressed from work",
-      time : new Date().getHours()+":"+ new Date().getMinutes()
-    },
-    {
-      id: 3,
-      msgAuthor: "amica",
-      message: "Okay, lets log this mood !",
-      time : new Date().getHours()+":"+ new Date().getMinutes()
-    },
-    {
-      id: 4,
-      msgAuthor: "you",
-      message: "Sure",
-      time : new Date().getHours()+":"+ new Date().getMinutes()
-    },
-    {
-      id: 5,
-      msgAuthor: "amica",
-      message: "Describe the mood",
-      time : new Date().getHours()+":"+ new Date().getMinutes()
-    },
-    {
-      id: 6,
-      msgAuthor: "you",
-      message: "Stressed",
-      time : new Date().getHours()+":"+ new Date().getMinutes()
-    },
-    {
-      id: 7,
-      msgAuthor: "And the cause ?",
-      message: "And the cause ?",
-      time : new Date().getHours()+":"+ new Date().getMinutes()
-    },
-    {
-      id: 8,
-      msgAuthor: "you",
-      message: "Work",
-      time : new Date().getHours()+":"+ new Date().getMinutes()
-    },
-    {
-      id: 9,
-      msgAuthor: "amica",
-      message: "Hmm, I think I might have something for you. So if something is stressing you out regularly like work this tension can build up day after day. It’s important to have a destressing routine. This can be meditation or a relaxation technique to do when you’re home from work. Want to hear?",
-      time : new Date().getHours()+":"+ new Date().getMinutes()
-    },
-    ]
+
   return (
 <>
     <FlatList
     data={chatHistory}
-
     renderItem={({ item }) => (
-      <View style={item.msgAuthor==="you" ? styles.youMsgContainer:styles.amicaMsgContainer}>
-        {console.log("printing whole item object")}
-        {console.log(item)}
+      <View style={item.is_user ? styles.youMsgContainer:styles.amicaMsgContainer}>
       <View>
-        <Text>{item.msgAuthor ==="you"? "You:":"Amica:"}</Text>
-        <View style={item.msgAuthor === "you" ? styles.youMsgBox:styles.amicaMsgBox} >
-          <Text>{item.msg}</Text>
-          <Text>{item.timestamp}</Text>
+        <Text style={styles.msgLabel}>{item.is_user ? "You:":"Amica:"}</Text>
+        <View style={item.is_user ? styles.youMsgBox:styles.amicaMsgBox} >
+          <Text style={item.is_user ? styles.youMsgText:styles.amicaMsgText}>{item.msg}</Text>
+          <Text style={item.is_user ? styles.youTime:styles.amicaTime}>{item.timestamp}</Text>
         </View> 
         </View>
         {item.context && item.context.length > 0 ? (
               <View>
-              {console.log("item.context")}
-              {console.log(item.context[1])}
-              {console.log("///item.context")}
-              {console.log(item.context)}
-                <Text>Amica</Text> 
+                <Text style={styles.msgLabel}>Amica</Text> 
                 <View style={styles.amicaMsgBox} >
-                  <Text>{item.context[1].response}</Text>
-                  <Text>{item.timestamp}</Text>
+                  <Text style={styles.amicaMsgText}>{item.context[1].response}</Text>
+                  <Text style={styles.amicaTime}>{item.timestamp}</Text>
                 </View>
               </View>
-    
-          
        ):(
           <>
           <Text>None</Text>
@@ -142,14 +75,11 @@ const dummyMessages = [
         )}
       </View>
     )} 
- 
     />
-    
     <View style={styles.chatfooter}>
     <TextInput
       style={styles.messageInput} 
       placeholder='Message...'
-  
       onChangeText={(message) => setCurrentMessage(message)}
       onSubmitEditing={() => sendMessage()}
     />
@@ -167,55 +97,60 @@ const styles = StyleSheet.create({
     messageInput:{ 
         width: "90%",
         borderRadius: 5,
+        borderWidth:0.5,
+        borderColor: colors.label,
         backgroundColor: "#ffff",
         paddingVertical: 10,
-        paddingHorizontal: 10,    
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 1,
-        }
+        paddingHorizontal: 10,
     },
     amicaMsgContainer:{
         marginVertical: 16,
         marginLeft:10
        //flexDirection:"row-reverse"
       },
+      msgLabel:{
+        color: colors.label,
+        fontSize:12,
+        marginBottom:4,
+        marginTop:4
+      },
     youMsgContainer:{
         marginRight:10,
         marginLeft: "50%"
       },
     youMsgBox:{
-        color: colors.font,
-        backgroundColor: colors.secondary,
+        backgroundColor: colors.primary,
         padding: 5,
         width: "100%",
         borderRadius:5,
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 1,
-        },
-        shadowOpacity: 0.22,
-        shadowRadius: 2.22,
-        elevation: 3,
-        
+      },
+      youMsgText:{
+        color: colors.background,
+        fontSize: 11,
+      },
+      youTime:{
+        color: colors.background,
+        fontSize: 10,
+        paddingTop:3
       },
       amicaMsgBox: { 
         color: colors.font,
-        backgroundColor: colors.primary,
+        backgroundColor: colors.secondary,
         padding: 5,
         width: "50%",
         borderRadius:5,
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 1,
-        },
-        shadowOpacity: 0.22,
-        shadowRadius: 2.22,
-        elevation: 3,
+        borderWidth: 0.5,
+        borderColor: colors.label
       },
+      amicaMsgText:{
+        color: colors.font,
+        fontSize: 11,
+      },
+      amicaTime:{
+        color: colors.label,
+        fontSize: 10,
+        paddingTop:3
+      }
 });
 
 export default Chat

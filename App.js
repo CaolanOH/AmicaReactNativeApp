@@ -16,7 +16,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import WelcomeScreen from './screens/WelcomeScreen';
 import SignUpScreen from './screens/SignUpScreen';
 import AmicaScreen from './screens/AmicaScreen';
-import MoodLogger from './screens/tabs/Moodlogger';
+import Mood from './screens/tabs/Mood';
 import Journal from './screens/tabs/Journal';
 // Components
 import Header from './components/Header';
@@ -25,7 +25,7 @@ import { View, StyleSheet } from 'react-native';
 // Colors
 import colors from './config/colors';
 // Icons
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons'; 
 import { FontAwesome5 } from '@expo/vector-icons'; 
 
 
@@ -78,16 +78,28 @@ const MyTheme = {
 
 
 // Function tabs to return the tab navigator that is passed as children to..
-// const tabs = () => {
-//   return <BottomTabs.Navigator >
-//           <BottomTabs.Screen name="MoodLog" component={MoodLogger}/>
-//           <BottomTabs.Screen name="Amica" component={AmicaScreen} options={{headerTitle: () =>  <Header />,}} />
-//           <BottomTabs.Screen name="Journal" component={Journal} />
-//           </BottomTabs.Navigator>
+ const tabs = () => {
+   return <BottomTabs.Navigator screenOptions={{tabBarShowLabel: false, activeBackgroundColor: colors.primary}}>
+           <BottomTabs.Screen name="Mood" component={Mood} options={{headerTitle: () =>  <Header />,
+             tabBarIcon: ({focused}) =>(
+              <Ionicons name="bookmark" size={24} color={ focused ? colors.primary : colors.label} />
+             )
+           }}/>
+          <BottomTabs.Screen name="Amica" component={AmicaScreen} options={{headerTitle: () =>  <Header />,
+              tabBarIcon: ({focused}) =>(
+               <Ionicons name="chatbubbles" size={24} color={ focused ? colors.primary : colors.label} />
+              )
+            }} />
+          <BottomTabs.Screen name="Journal" component={Journal}  options={{headerTitle: () =>  <Header />,
+             tabBarIcon: ({focused}) =>(
+              <Ionicons name="journal" size={24} color={ focused ? colors.primary : colors.label} />
+             )
+           }} />
+          </BottomTabs.Navigator>
 
-
+ }
 // Function tabs to return the tab navigator that is passed as children to..
-  const tabs = () => {
+  const tabs02 = () => {
                 return <BottomTabs.Navigator screenOptions={{
                   tabBarShowLabel: false,
                   activeBackgroundColor: colors.background,
@@ -110,7 +122,7 @@ const MyTheme = {
                         <BottomTabs.Screen name="MoodLog" component={MoodLogger} options={{
                           tabBarIcon: ({focused}) => (
                             <View style={{ position: "absolute", top:"50%"}}>
-                              <Feather name="bookmark" size={24} color={ focused ? colors.danger : colors.font} />
+                             <Ionicons name="bookmark" size={24} color={ focused ? colors.danger : colors.font} />
                             </View>
                           )
                         }} />
@@ -150,7 +162,6 @@ const MyTheme = {
         </>
         ):( 
          <>
-          
           <Stack.Screen name="Home"  children={tabs} />
         </>
       )} 
@@ -166,13 +177,6 @@ const MyTheme = {
     </Provider>
   );
 }
-
-
-const styles = StyleSheet.create({
-  tabNav:{
-    
-  }
-})
 
 
 export default App;
