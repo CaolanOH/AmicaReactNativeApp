@@ -1,27 +1,33 @@
 import {useState} from 'react'
 import axios from 'axios'
 import { StyleSheet, View, Text,TextInput, TouchableOpacity } from 'react-native';
-// React redux
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../store/user';
-// colors
 import colors from '../config/colors';
-const Login = ({setIsRegistered}) => {
-// Redux user state
-const user = useSelector((state) => state.user.value);
-// Redux dispatch
-const dispatch = useDispatch();
- // useState for login form
-//  email:"mohche@test.com", password:"secret"
+const Register = ({setIsRegistered}) => {
+// useState for register form
 const [form, setForm] = useState({})
 // useState for validation errors
 const [errors, setErrors] = useState({})
-// Form Validation Function. Returns variable isValid  
+// Redux user dispatch
+const dispatch = useDispatch();
+// Handle form function
+const handleFormInput = (field, value) => {
+  setForm({ 
+    ...form,
+    [field]: value
+  })
+}
+// Form Validation Function. Returns variable isValid 
 // as true or false depending on whether the form data 
 // passes the validation rules.
 const validate = () =>{
   const err = {}
   let isValid = true;
+  if(!form.username){
+      err.username = "Username required"
+      isValid = false;
+  }
   if(!form.email){
       err.email = "Email required"
       isValid = false;
@@ -33,22 +39,26 @@ const validate = () =>{
   if (!form.password) {
       err.password = 'Password is required';
       isValid = false;
-  } 
+  } else if (form.password.length < 6) {
+      err.password = 'Password needs to be 8 characters or more';
+      isValid = false;
+  }
+  if (!form.password02) {
+      err.password02 = 'Password is required';
+      isValid = false;
+  } else if (form.password02 !== form.password) {
+      err.password2 = 'Passwords do not match';
+      isValid = false;
+  }
   setErrors(err);
   return isValid      
 }
-// Handle form function
-const handleFormInput = (field, value) => {
-    setForm({ 
-      ...form,
-      [field]: value
-  })
-}
 // Submit form function
 const submitForm = () => { 
-  const isValid = validate(form)
-  if(isValid){
-    axios.post('http://127.0.0.1:5000/users/login', {
+    const isValid = validate(form)
+    if (isValid){
+    axios.post('http://127.0.0.1:5000/users/register', {
+      username: form.username,
       email: form.email,
       password: form.password
     })
@@ -61,16 +71,24 @@ const submitForm = () => {
   }
 }
   return (
-      <>
-        <Text style={errors.email? styles.emailLabelError: styles.emailLabel} >{errors.email ? errors.email: "Email :"}</Text>
+<>
+        <Text style={errors.username ? styles.emailLabelError: styles.emailLabel} >{errors.username ? errors.username:"Username :"}</Text>
+        <TextInput 
+        name="username" 
+        style={errors.username ? styles.inputError:styles.input} 
+        keyboardType="default"
+        onChangeText={(username) => handleFormInput('username', username)}
+        onSubmitEditing={submitForm}
+        />
+       <Text style={errors.email ? styles.passwordLabelError: styles.passwordLabel} >{errors.email ? errors.email:"Email :"}</Text>
         <TextInput 
         name="email" 
-        style={errors.email? styles.inputError:styles.input} 
+        style={errors.email ? styles.inputError:styles.input} 
         keyboardType="default"
         onChangeText={(email) => handleFormInput('email', email)}
         onSubmitEditing={submitForm}
         />
-        <Text style={errors.password ? styles.passwordLabelError:styles.passwordLabel} >{errors.password ? errors.password:"Password :"}</Text>
+        <Text style={errors.password ? styles.passwordLabelError: styles.passwordLabel} >{errors.password ? errors.password:"Password :"}</Text>
         <TextInput 
         name="password" 
         style={errors.password ? styles.inputError:styles.input} 
@@ -79,36 +97,42 @@ const submitForm = () => {
         onChangeText={(password) => handleFormInput('password', password)}
         onSubmitEditing={submitForm}
         />
-        <View/>
-        <TouchableOpacity style={styles.logInBtn} onPress={submitForm} >
-            <Text style={styles.logInBtnText}>LOGIN</Text>
+        <Text style={errors.password02 ? styles.passwordLabelError: styles.passwordLabel} >{errors.password02 ? errors.password02:"Confirm Password :"}</Text>
+        <TextInput 
+        name="password02" 
+        style={errors.password02 ? styles.inputError:styles.input} 
+        secureTextEntry={true}
+        keyboardType="default"
+        onChangeText={(password02) => handleFormInput('password02', password02)}
+        onSubmitEditing={submitForm}
+        />
+         <TouchableOpacity style={styles.logInBtn} onPress={submitForm} >
+            <Text style={styles.logInBtnText}>REGISTER</Text>
         </TouchableOpacity>
 
         <View style={styles.signUpView}>
-        <Text style={styles.memberText}>Don't have an account?</Text><TouchableOpacity onPress={()=>setIsRegistered(false)}><Text style={styles.signUptext} >Sign Up Here</Text></TouchableOpacity>
+        <Text style={styles.memberText}>Already have an account?</Text><TouchableOpacity onPress={()=>setIsRegistered(true)}><Text style={styles.signUptext} >Login Here</Text></TouchableOpacity>
         </View>
 </>
   )
 }
-const styles = StyleSheet.create({
-      logInBtn:{
+// Styles
+ const styles = StyleSheet.create({
+    logInBtn:{
         justifyContent:"center",
         width: "90%",
-        height: 64,
+    
         backgroundColor: colors.primary,
         borderRadius: 5,
-        marginTop: 40,
+        marginTop: 20,
         marginLeft: 20
       },
       logInBtnText:{
           fontSize: 20,
-          paddingVertical: 18,
+          paddingVertical: 16,
           textAlign: 'center',
           fontWeight:"600",
           color:"#ffff"
-      },
-      inputContainer:{
-        alignItems:"center",
       },
       emailLabel: {
         color: colors.label,
@@ -139,7 +163,7 @@ const styles = StyleSheet.create({
         borderColor: colors.label,
         borderRadius: 5,
         padding:10,
-        marginTop: 10,
+        marginTop: 3,
         marginBottom: 10,
         marginLeft: 20
       },
@@ -157,7 +181,7 @@ const styles = StyleSheet.create({
       signUpView:{
         flexDirection: "row", 
         justifyContent: "flex-end",
-        marginTop:56
+        marginTop:24
       },
       memberText:{
         fontSize: 14,
@@ -171,6 +195,6 @@ const styles = StyleSheet.create({
         paddingLeft: 5
         
       }
-});
 
-export default Login
+ })
+export default Register

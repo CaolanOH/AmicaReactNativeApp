@@ -1,12 +1,15 @@
+// React Imports
+import { useState } from 'react';
+// React Native Imports
 import { StyleSheet, Text, View,StatusBar, Platform,ImageBackground } from 'react-native';
 // Components
 import Login from '../components/Login'
+import Register from '../components/Register';
 // colors
 import colors from "../config/colors"
-
-
-const WelcomeScreen = (props) => {
-
+const WelcomeScreen = () => {
+// useState for the conditional statement below
+const [isRegistered, setIsRegistered] = useState(true)
   return (
        <>
          <ImageBackground
@@ -15,13 +18,18 @@ const WelcomeScreen = (props) => {
          >
         <Text style={styles.amica}>Amica.</Text>
         <View style={{height:'50%', width:'100%',borderRadius:15, backgroundColor:'white', }}>
-        <Login/>
+          { !isRegistered ? (
+            <Register setIsRegistered={setIsRegistered}/>
+          ):(
+        <Login setIsRegistered={setIsRegistered} />
+          )
+          }
         </View> 
          </ImageBackground>
         </>
   )
 }
-
+// Styles
 const styles = StyleSheet.create({
   img:{
     flex:2,
@@ -43,3 +51,4 @@ const styles = StyleSheet.create({
   });
 
 export default WelcomeScreen
+

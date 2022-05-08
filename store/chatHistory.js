@@ -1,5 +1,6 @@
+// Redux Toolkit Import
 import  { createSlice } from "@reduxjs/toolkit"
-
+// Creating chat history slice, setting initial state, and creating reducers
 export const chatHistorySlice = createSlice({
     name: "chatHistory",
     initialState: {value:[]},
@@ -9,8 +10,5 @@ export const chatHistorySlice = createSlice({
           }
     }
 })
-
 export const { addMessage } = chatHistorySlice.actions;
-
-
 export default chatHistorySlice.reducer;

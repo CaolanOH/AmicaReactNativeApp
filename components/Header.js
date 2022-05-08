@@ -1,29 +1,42 @@
+// React Import
 import React from 'react';
-import { StyleSheet,Text, View, TouchableOpacity } from 'react-native';
+// React Native Imports
+import { StyleSheet,Text, View, TouchableOpacity, Alert } from 'react-native';
+// Colors Imports
 import colors from "../config/colors";
+// Icon Imports
 import { FontAwesome } from '@expo/vector-icons'; 
-import Position from 'react-native/Libraries/Components/Touchable/Position';
-import {useRoute} from '@react-navigation/native';
-import { roundToNearestPixel } from 'react-native/Libraries/Utilities/PixelRatio';
+// React Navigation Imports
+import {useRoute, useNavigation} from '@react-navigation/native';
 const Header = () => {
-    const screen = useRoute(); 
+// getting current screen / route information
+const screen = useRoute();
+// React Navigation, navigation instance
+const navigation = useNavigation(); 
   return (
-    
-    <View style={styles.header}>
-       <FontAwesome name="cog" size={24} color={colors.label} />
-        <View>
-            <Text style={styles.headerText}>{screen.name}</Text>
-        </View>
-        <View>
-            <TouchableOpacity style={styles.sosBtn}>
-                <Text style={styles.sosText}>S.O.S</Text>
-            </TouchableOpacity>
-            </View>
+<View style={styles.header}>
+    {screen.name === "JournalEntry" ? (
+        <TouchableOpacity onPress={()=>navigation.navigate('JournalEntry')}>
+        <FontAwesome name="arrow-left" size={24} color={colors.label} />
+        </TouchableOpacity>
+    ):(
+        <TouchableOpacity>
+        <FontAwesome name="cog" size={24} color={colors.label} />
+        </TouchableOpacity>
+    )}
+    <View>
+        <Text style={styles.headerText}>{screen.name}</Text>
     </View>
+    <View>
+        <TouchableOpacity style={styles.sosBtn} onPress={()=>Alert.alert("Emergency information","Emergency services : 112 or 999\nSemaritans : 116 123\nAware : 1800 80 48 48\nPieta House : 1800 247 247")}>
+            <Text style={styles.sosText}>S.O.S</Text>
+        </TouchableOpacity>
+    </View>
+</View>
     
   )
 }
-
+// Styles
 const styles = StyleSheet.create({
     header:{
         width: "100%",

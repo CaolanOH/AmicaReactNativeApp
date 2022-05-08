@@ -1,18 +1,28 @@
-import {useEffect, useState} from 'react'
-import { StyleSheet, Text, View,  TextInput, FlatList } from 'react-native';
+// React Imports
+import {useEffect, useState, useRef} from 'react'
+// React Native Imports
+import { StyleSheet, Text, View,  TextInput, FlatList, Modal, Pressable, ScrollView } from 'react-native';
+// Colors Imports
 import colors from '../config/colors';
+// Redux Imports
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage } from '../store/chatHistory';
-import user from '../store/user';
 import moment from 'moment';
-
+// Component Imports
+import MoodModal from './modals/MoodModal';
+import JournalModal from './modals/JournalModal';
 const Chat = ({ socket }) => {
-  const chatHistory = useSelector((state) =>state.chatHistory.value)
-  const user = useSelector((state) =>state.user.value)
-  const dispatch = useDispatch();
-
+// Redux chat history state
+const chatHistory = useSelector((state) =>state.chatHistory.value)
+// Redux user state
+const user = useSelector((state) =>state.user.value)
+// Reduce dispatch
+const dispatch = useDispatch();
+// Flatlist reference object for displaying messages animation.
+const flatListRef = useRef();
 // useState for the users current message they want to send
 const [currentMessage, setCurrentMessage] = useState("");
+
 //Function to send message
 const sendMessage = () => {
   if(currentMessage !== ""){
@@ -21,58 +31,59 @@ const sendMessage = () => {
       token:  user.access_token,
       msg: currentMessage,
       is_user: true,
-      timestamp: new Date().toISOString(),
-      context:""
+      timestamp: new Date().toISOString()
     };
     dispatch(addMessage(messageData))
     console.log("This is the chat history below")
     console.log(chatHistory)
     socket.emit('msg_from_react', messageData);
-  
   }
 }
+// useEFFect for getting chathistory
+// useEffect(() =>{
+// axios.get('http://127.0.0.1:5000/users/chat_log', {
+//   headers: {
+//    "Authorization": `Bearer ${user.access_token}`
+//  }}).then(response =>{
+//     list = response.data.log;
+//     list.forEach(li => dispatch(addMessage(li)))
+//  })
+
+//},[chatHistory])
 
 // useEffect for displaying messages.
 useEffect(() => {
   socket.on("msg_from_flask", (data) =>{
       console.log(`Received Message from flask, this is in the useEffect`);
       console.log(data);
-      // using spread operator.. look into it. Opens up the array and put the content(data) at the end if array.
       dispatch(addMessage(data))
       console.log("Outputing the chat history below this is in the useEffect")
       console.log(chatHistory.msg)
-
   })
 }, [socket])
-
-
-
   return (
 <>
     <FlatList
+    ref={flatListRef}
     data={chatHistory}
+    keyExtractor={(chatHistory, index) => index.toString()}
+    onContentSizeChange={() => flatListRef.current.scrollToEnd({animated: true})}
     renderItem={({ item }) => (
       <View style={item.is_user ? styles.youMsgContainer:styles.amicaMsgContainer}>
       <View>
         <Text style={styles.msgLabel}>{item.is_user ? "You:":"Amica:"}</Text>
         <View style={item.is_user ? styles.youMsgBox:styles.amicaMsgBox} >
           <Text style={item.is_user ? styles.youMsgText:styles.amicaMsgText}>{item.msg}</Text>
-          <Text style={item.is_user ? styles.youTime:styles.amicaTime}>{item.timestamp}</Text>
+          <Text style={item.is_user ? styles.youTime:styles.amicaTime}>{moment(item.timestamp).fromNow()}</Text>
         </View> 
         </View>
-        {item.context && item.context.length > 0 ? (
-              <View>
-                <Text style={styles.msgLabel}>Amica</Text> 
-                <View style={styles.amicaMsgBox} >
-                  <Text style={styles.amicaMsgText}>{item.context[1].response}</Text>
-                  <Text style={styles.amicaTime}>{item.timestamp}</Text>
-                </View>
-              </View>
-       ):(
-          <>
-          <Text>None</Text>
-          </>
-        )}
+        {item.action ?
+          item.action == "journal" ? (
+              <JournalModal />
+          ):(
+            <MoodModal />
+          ): null
+       }
       </View>
     )} 
     />
@@ -83,16 +94,21 @@ useEffect(() => {
       onChangeText={(message) => setCurrentMessage(message)}
       onSubmitEditing={() => sendMessage()}
     />
-    {/* <Feather name="send" size={24} color="black" /> */}
     </View>
 </>
   )
 }
-
+// Styles
 const styles = StyleSheet.create({
     chatfooter:{
         marginVertical:10,
         alignItems:"center"
+      },
+      centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
       },
     messageInput:{ 
         width: "90%",
@@ -106,7 +122,6 @@ const styles = StyleSheet.create({
     amicaMsgContainer:{
         marginVertical: 16,
         marginLeft:10
-       //flexDirection:"row-reverse"
       },
       msgLabel:{
         color: colors.label,
@@ -150,7 +165,24 @@ const styles = StyleSheet.create({
         color: colors.label,
         fontSize: 10,
         paddingTop:3
+      },
+      button: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2
+      },
+      buttonOpen: {
+        backgroundColor: "#F194FF",
+      },
+      buttonClose: {
+        backgroundColor: "#2196F3",
+      },
+      modalBtn:{
+        padding: 10,
+      },
+      modalBtnText:{
+        fontSize:10,
+        color: colors.primary
       }
 });
-
 export default Chat

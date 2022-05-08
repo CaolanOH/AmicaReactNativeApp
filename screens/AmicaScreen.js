@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addMessage } from '../store/chatHistory';
 // Socket.IO client
 import io from 'socket.io-client'
-//Creating isntance of socket io client
+
 
 //importing colors for styling
 import colors from "../config/colors";
@@ -24,29 +24,30 @@ const AmicaScreen = () => {
 
   // const socket = io.connect('http://127.0.0.1:5000')
 
-
-  const socket = io.connect('http://127.0.0.1:5000', {
+//Creating isntance of socket io client
+const socket = io.connect('http://127.0.0.1:5000', {
   extraHeaders: {
     Authorization: `Bearer ${user.access_token}`
   }
 })
 
-// const user = useSelector((state) => state.user.value);
-
-
-
 
 // socket.io connection event
 socket.on('connect', () =>{
-  console.log('Connected to Flask app');
-  //socket.emit('get_chat_log', user.access_token)
-  //socket.on('chat_log_from_flask', (data)=>{
-    //console.log("////// Below this is chat history from db //////")
-    //console.log(data)
-    // dispatch(addMessage(data))
-    // console.log("////// Redux chat history //////")
-    // console.log(chat.value)
-  //})
+  //`Axios statement here
+
+
+
+  //`Axios statement here
+  // console.log('Connected to Flask app');
+  // socket.emit('get_chat_log', user.access_token)
+  //  socket.on('chat_log_from_flask', (data)=>{
+  //    console.log("////// Below this is chat history from db //////")
+  //    console.log(data)
+  //     dispatch(addMessage(data))
+  //     console.log("////// Redux chat history //////")
+  //     console.log(chat.value)
+  //  })
 })
 
 
@@ -59,7 +60,7 @@ socket.on('connect', () =>{
     <SafeAreaView style={styles.container}>
     <Chat socket={socket} />
     </SafeAreaView>
-      </>
+  </>
   )
 }
 
