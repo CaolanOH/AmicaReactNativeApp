@@ -1,5 +1,6 @@
 // React Imports
 import {useEffect, useState, useRef} from 'react'
+import axios from 'axios';
 // React Native Imports
 import { StyleSheet, Text, View,  TextInput, FlatList, Modal, Pressable, ScrollView } from 'react-native';
 // Colors Imports
@@ -7,6 +8,7 @@ import colors from '../config/colors';
 // Redux Imports
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage } from '../store/chatHistory';
+
 import moment from 'moment';
 // Component Imports
 import MoodModal from './modals/MoodModal';
@@ -39,17 +41,7 @@ const sendMessage = () => {
     socket.emit('msg_from_react', messageData);
   }
 }
-// useEFFect for getting chathistory
-// useEffect(() =>{
-// axios.get('http://127.0.0.1:5000/users/chat_log', {
-//   headers: {
-//    "Authorization": `Bearer ${user.access_token}`
-//  }}).then(response =>{
-//     list = response.data.log;
-//     list.forEach(li => dispatch(addMessage(li)))
-//  })
 
-//},[chatHistory])
 
 // useEffect for displaying messages.
 useEffect(() => {
@@ -91,6 +83,8 @@ useEffect(() => {
     <TextInput
       style={styles.messageInput} 
       placeholder='Message...'
+      autoCapitalize = 'none'
+      clearButtonMode="always"
       onChangeText={(message) => setCurrentMessage(message)}
       onSubmitEditing={() => sendMessage()}
     />

@@ -5,6 +5,9 @@ export const chatHistorySlice = createSlice({
     name: "chatHistory",
     initialState: {value:[]},
     reducers:{
+      getMessages: (state, action)=> {
+        state.value.push(action.payload);
+      },
           addMessage: (state, action)=> {
             state.value.push(action.payload);
           }

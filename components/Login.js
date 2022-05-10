@@ -13,7 +13,7 @@ const user = useSelector((state) => state.user.value);
 const dispatch = useDispatch();
  // useState for login form
 //  email:"mohche@test.com", password:"secret"
-const [form, setForm] = useState({})
+const [form, setForm] = useState({email:"mohche@test.com",password:"secret"})
 // useState for validation errors
 const [errors, setErrors] = useState({})
 // Form Validation Function. Returns variable isValid  
@@ -45,7 +45,8 @@ const handleFormInput = (field, value) => {
   })
 }
 // Submit form function
-const submitForm = () => { 
+const submitForm = () => {
+  console.log(form) 
   const isValid = validate(form)
   if(isValid){
     axios.post('http://127.0.0.1:5000/users/login', {
@@ -64,7 +65,8 @@ const submitForm = () => {
       <>
         <Text style={errors.email? styles.emailLabelError: styles.emailLabel} >{errors.email ? errors.email: "Email :"}</Text>
         <TextInput 
-        name="email" 
+        name="email"
+        autoCapitalize = 'none' 
         style={errors.email? styles.inputError:styles.input} 
         keyboardType="default"
         onChangeText={(email) => handleFormInput('email', email)}
@@ -73,6 +75,7 @@ const submitForm = () => {
         <Text style={errors.password ? styles.passwordLabelError:styles.passwordLabel} >{errors.password ? errors.password:"Password :"}</Text>
         <TextInput 
         name="password" 
+        autoCapitalize = 'none'
         style={errors.password ? styles.inputError:styles.input} 
         secureTextEntry={true}
         keyboardType="default"

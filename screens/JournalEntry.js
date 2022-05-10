@@ -1,5 +1,6 @@
 import React from 'react'
 import { StyleSheet, Text, View, SafeAreaView} from 'react-native';
+import { useRoute } from '@react-navigation/native';
 import colors from '../config/colors';
 import moment from 'moment';
 const JournalEntry = () => {

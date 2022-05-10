@@ -5,6 +5,8 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './store/user';
 import chatHistoryReducer from './store/chatHistory';
+import moodListReducer from './store/moodList';
+import journalListReducer from './store/journalList';
 // React Native Navigator imports
 import { NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import AuthStack from './routes/AuthStack';
@@ -14,7 +16,9 @@ import colors from './config/colors';
 const store = configureStore({
     reducer: {
       user: userReducer,
-      chatHistory: chatHistoryReducer
+      chatHistory: chatHistoryReducer,
+      moodList: moodListReducer,
+      journalList: journalListReducer
     }
 });
 const App = () => {

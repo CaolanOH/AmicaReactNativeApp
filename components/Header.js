@@ -8,11 +8,15 @@ import colors from "../config/colors";
 import { FontAwesome } from '@expo/vector-icons'; 
 // React Navigation Imports
 import {useRoute, useNavigation} from '@react-navigation/native';
+import { logout } from '../store/user';
+import { useDispatch, useSelector } from 'react-redux';
 const Header = () => {
 // getting current screen / route information
 const screen = useRoute();
 // React Navigation, navigation instance
 const navigation = useNavigation(); 
+
+const dispatch = useDispatch();
   return (
 <View style={styles.header}>
     {screen.name === "JournalEntry" ? (
@@ -20,9 +24,11 @@ const navigation = useNavigation();
         <FontAwesome name="arrow-left" size={24} color={colors.label} />
         </TouchableOpacity>
     ):(
-        <TouchableOpacity>
+        
+        <TouchableOpacity onPress={() =>dispatch(logout())}>
         <FontAwesome name="cog" size={24} color={colors.label} />
         </TouchableOpacity>
+        
     )}
     <View>
         <Text style={styles.headerText}>{screen.name}</Text>

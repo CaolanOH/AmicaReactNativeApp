@@ -7,10 +7,15 @@ import { StyleSheet, Text, View,  TextInput, Modal, Pressable, FlatList, Button 
 // Colors Import
 import colors from '../../config/colors';
 // Redux Import
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { addMood } from '../../store/moodList.js';
+
 const MoodModal = () => {
 // Redux user state
 const user = useSelector((state) => state.user.value);
+const dispatch = useDispatch();
+
+
 // useState to toggle mood modal visibility 
 const [modalVisible, setModalVisible] = useState(false);
 // moods array for the mood modal
@@ -26,17 +31,24 @@ const handleFormInput = (field, value) => {
 }
 // Submit form function
 const submitForm = () => { 
-axios.post('http://127.0.0.1:5000/users/mood', mood, {
-  headers: {
-    "Authorization": `Bearer ${user.access_token}`
-  }
-})
-  .then(response => {
-  setModalVisible(!modalVisible)
-})
-  .catch(err => {
-  console.log(err)
-  })
+
+  axios.post('http://127.0.0.1:5000/users/mood', mood, {
+              headers: {
+                "Authorization": `Bearer ${user.access_token}`
+              }
+            })
+              .then(response => {
+              // setModalVisible(!modalVisible)
+              console.log(mood)
+              dispatch(addMood(mood))
+              setModalVisible(!modalVisible)
+            })
+              .catch(err => {
+              console.log(err)
+              })
+
+  
+
 }
   return (
 <>

@@ -2,43 +2,44 @@ import {useEffect, useState} from 'react'
 // Axios Import
 import axios from 'axios';
 // Redux Imports
-import { useSelector} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 // React Native Imports
 import { StyleSheet, Text, View, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
 // Journal Model Component Import
 import JournalModal from './modals/JournalModal';
+import { getJournalList } from '../store/journalList.js';
 // Colors Import
 import colors from '../config/colors';
 // Moment Import
 import moment from 'moment';
 const JournalList = ({ navigation }) => {
 // Redux user state
+const dispatch = useDispatch();
 const user = useSelector((state) => state.user.value);
+const journalList = useSelector((state) => state.journalList.value);
 // useState for journal entries
-const [journalList, setJournalList] = useState(null)
+//const [journalList, setJournalList] = useState(null)
 // useEffect to receive journal entries
 useEffect(() => {
 axios.get('http://127.0.0.1:5000/users/journal',{
     headers:{ 'Authorization': `Bearer ${user.access_token}` }
 })
 .then(response => {
-    setJournalList(response.data.journals)
-  })
+  dispatch(getJournalList({journals: response.data.journals}))
+})
 .catch(err => {
   console.log(`Error: ${err}`)
 })
-}, [journalList])
+}, [])
 
   return (
   <View>
-    {/* <JournalModal /> */}
+    <JournalModal />
     <FlatList 
     data={journalList}
     renderItem={({ item }) =>(
         <View  >
-          {console.log("////////")}
-          {console.log(item)}
-          {console.log("////////")}
+
           <Text style={styles.date} >{moment(item.timestamp).format('dddd Do, MMMM')}</Text>
           <TouchableOpacity  onPress={() => navigation.navigate('JournalEntry', {entry:{id:item.id, user_id:item.user_id, timestamp: item.timestamp, journal_body:item.journal_body}})} >
          <View style={styles.box}>

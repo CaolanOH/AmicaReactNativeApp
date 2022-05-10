@@ -1,37 +1,49 @@
 import {useEffect, useState} from 'react'
 // Axios Import
 import axios from 'axios';
-// Redu Import
-import { useSelector } from 'react-redux';
+// Redux Import
+import { useDispatch, useSelector } from 'react-redux';
 // React Native Imports
 import { StyleSheet, Text, View, SafeAreaView, FlatList } from 'react-native';
 // Colors Import
 import colors from '../config/colors';
 // Moment Import
 import moment from 'moment';
-const MoodList = () => {
-// Redux user state
-const user = useSelector((state) => state.user.value);
-// useState for moods
-const [moodList, setMoodList] = useState(null)
+import { addMood, getMoodList } from '../store/moodList.js';
 
-// useeffect to get moods
-useEffect(() => {
-axios.get('http://127.0.0.1:5000/users/mood',{
-    headers:{ 'Authorization': `Bearer ${user.access_token}` }
-})
-.then(response => {
-    setMoodList(response.data.moods)
-})
-.catch(err => {
-    console.log(`Error: ${err}`)
+
+const MoodList = ({ moods }) => {
+// Redux user state
+const dispatch = useDispatch();
+const user = useSelector((state) => state.user.value);
+const moodList = useSelector((state) => state.moodList.value);
+
+// useState for moods
+// const [moodList, setMoodList] = useState(null)
+
+
+// // useeffect to get moods
+ useEffect(() => {
+    axios.get('http://127.0.0.1:5000/users/mood',{
+        headers:{ 'Authorization': `Bearer ${user.access_token}` }
     })
-}, [moodList])
+    .then(response => {
+      dispatch(getMoodList({moods: response.data.moods}))
+
+      console.log(state.value);
+    })
+    .catch(err => {
+        console.log(`Error: ${err}`)
+        })
+
+    
+ }, [])
 
 return (
    <View>
        <FlatList  
        data={moodList}
+       keyExtractor={(moodList, index) => index.toString()}
        renderItem={({ item }) =>(
            <View>
                <Text style={styles.date}>{moment(item.timestamp).format('dddd Do, MMMM')}</Text>

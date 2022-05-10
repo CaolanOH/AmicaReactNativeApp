@@ -1,8 +1,9 @@
 import {useState, useEffect} from 'react'
+import axios from 'axios'
 import { SafeAreaView,StyleSheet, Text, View,StatusBar, TouchableOpacity, TextInput, Platform, FlatList } from 'react-native';
 // Redux useSelector
 import { useSelector, useDispatch } from 'react-redux';
-import { addMessage } from '../store/chatHistory';
+import { getMessages } from '../store/chatHistory';
 // Socket.IO client
 import io from 'socket.io-client'
 
@@ -30,7 +31,22 @@ const socket = io.connect('http://127.0.0.1:5000', {
     Authorization: `Bearer ${user.access_token}`
   }
 })
-
+// const displayMessages = (data) => {
+//   data.forEach(d => dispatch(addMessage(d)))
+// }
+//useEFFect for getting chathistory
+useEffect(() =>{
+  axios.get('http://127.0.0.1:5000/users/chat_log', {
+    headers: {
+     "Authorization": `Bearer ${user.access_token}`
+   }}).then(response =>{
+      list = response.data.log;
+      dispatch(getMessages(list))
+   }).catch(err => {
+    console.log(err)
+    })
+  
+  },[])
 
 // socket.io connection event
 socket.on('connect', () =>{

@@ -7,7 +7,8 @@ import { useState } from 'react';
 // Colors Import
 import colors from '../../config/colors';
 // Redux Import
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { addJournal } from '../../store/journalList.js';
 const JournalModal = () => {
 // useState to toggle modal visibility 
 const [modalVisible, setModalVisible] = useState(false);
@@ -15,6 +16,7 @@ const [modalVisible, setModalVisible] = useState(false);
 const [journal, setJournal] = useState({})
 // Redux user state
 const user = useSelector((state) => state.user.value);
+const dispatch = useDispatch();
 // Handle form function
 const handleFormInput = (field, value) => {
   setJournal({ 
@@ -23,14 +25,15 @@ const handleFormInput = (field, value) => {
   })
 }
 // Submit form function
-const submitForm = () => {      
+const submitForm = () => { 
+       
   axios.post('http://127.0.0.1:5000/users/journal', journal, {
      headers: {
       "Authorization": `Bearer ${user.access_token}`
     }
     })
     .then(response => {
-      console.log(response.data);
+      dispatch(addJournal(journal))
       setModalVisible(!modalVisible)
     })
     .catch(err => {
