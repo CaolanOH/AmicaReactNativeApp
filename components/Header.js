@@ -25,7 +25,7 @@ const dispatch = useDispatch();
         </TouchableOpacity>
     ):(
         
-        <TouchableOpacity onPress={() =>dispatch(logout())}>
+        <TouchableOpacity onPress={() =>dispatch(logout(false))}>
         <FontAwesome name="cog" size={24} color={colors.label} />
         </TouchableOpacity>
         
